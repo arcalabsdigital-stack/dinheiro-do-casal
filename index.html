@@ -2,25 +2,6 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<!-- Meta Pixel Code -->
-<script>
-  var META_PIXEL_ID = '642109472173213'; // Pixel Meta — campanha "Destravando o Lucro" (reaproveitado, conforme briefing)
-  !function(f,b,e,v,n,t,s)
-  {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-  n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-  if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-  n.queue=[];t=b.createElement(e);t.async=!0;
-  t.src=v;s=b.getElementsByTagName(e)[0];
-  s.parentNode.insertBefore(t,s)}(window,document,'script',
-  'https://connect.facebook.net/en_US/fbevents.js');
-  fbq('init', META_PIXEL_ID);
-  fbq('track', 'PageView');
-  // Purchase NÃO é disparado aqui: a Hotmart já dispara esse evento no checkout/obrigado.
-</script>
-<noscript><img height="1" width="1" style="display:none"
-  src="https://www.facebook.com/tr?id=642109472173213&ev=PageView&noscript=1"
-/></noscript>
-<!-- End Meta Pixel Code -->
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dinheiro do Casal — a planilha que mostra para onde vai cada real</title>
@@ -41,13 +22,13 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Poppins carregada sem bloquear a renderização (preload + swap para "stylesheet") -->
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"></noscript>
+<!-- Fontes carregadas sem bloquear a renderização (preload + swap para "stylesheet") -->
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap"></noscript>
 
-<!-- Imagem do hero (LCP) pré-carregada -->
-<link rel="preload" as="image" href="/assets/img/hero-casal.webp">
+<!-- Imagem do hero (LCP) pré-carregada — versão mobile, a que carrega por padrão -->
+<link rel="preload" as="image" href="/assets/img/hero-casal-mobile-480.webp" imagesrcset="/assets/img/hero-casal-mobile-480.webp 480w, /assets/img/hero-casal-mobile-800.webp 800w" imagesizes="(min-width: 1024px) 0px, 90vw">
 
 <!-- Tailwind compilado para produção (não usamos o CDN: ele compila no navegador e prejudica a performance) -->
 <link rel="stylesheet" href="/assets/css/styles.css">
@@ -60,7 +41,7 @@
   /* ---- Botão de compra: pulsação idêntica em todos os CTAs ---- */
   .btn{ animation: pulse 1.5s infinite; will-change: transform; }
   .btn:hover{ animation: none; }
-  @keyframes pulse{ 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.06); } }
+  @keyframes pulse{ 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.1); } }
   @media (prefers-reduced-motion: reduce){ .btn{ animation:none; } }
 
   /* ---- Balões flutuantes de sonhos (hero) ---- */
@@ -72,8 +53,12 @@
   @keyframes floaty{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-10px); } }
   @media (prefers-reduced-motion: reduce){ .float-badge{ animation:none; } }
 
-  /* ---- Balões de fala (seção dor) ---- */
-  .speech{ position:relative; background:#fff; color:#A83A56; }
+  /* ---- Balões de fala (seção dor) ----
+     Sem position:relative aqui de propósito: o elemento já é .absolute
+     (utilitário Tailwind) na marcação, que também serve de contexto de
+     posicionamento para o ::after. Declarar position aqui neste bloco
+     <style> (fora de @layer) venceria o utilitário Tailwind na cascata. */
+  .speech{ background:#fff; color:#6E2440; }
   .speech:after{ content:""; position:absolute; width:0; height:0; border:9px solid transparent; }
   .speech.tail-bl:after{ left:22px; bottom:-16px; border-top-color:#fff; }
   .speech.tail-br:after{ right:22px; bottom:-16px; border-top-color:#fff; }
@@ -87,12 +72,27 @@
   .faq-icon{ transition: transform .2s ease; }
   details.faq > summary:focus-visible,
   a:focus-visible, button:focus-visible{ outline:3px solid #1E4FA3; outline-offset:2px; border-radius:6px; }
+
+  /* ---- Revelação suave ao rolar ----
+     Visível por padrão (progressive enhancement): só fica invisível se o JS
+     confirmar suporte a IntersectionObserver e assumir o controle (classe
+     .js-anim no <html>). Assim, qualquer falha/atraso do JS nunca esconde
+     conteúdo — o pior caso é a animação simplesmente não acontecer. */
+  .reveal{ opacity:1; transform:none; }
+  .js-anim .reveal{ opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease; }
+  .js-anim .reveal.in{ opacity:1; transform:translateY(0); }
+
+  /* ---- Barra fixa de compra (mobile) ---- */
+  #sticky-bar{ transform: translateY(120%); transition: transform .35s ease; }
+  #sticky-bar.show{ transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce){ #sticky-bar{ transition:none; } }
 </style>
 </head>
 <body class="text-body">
 
 <!-- Sprite de ícones SVG reutilizados (ilustração própria, sem banco de imagens) -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- ícones "cheios" (círculo + símbolo branco) — checks, avisos, badges de sonho -->
   <symbol id="ic-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="currentColor"/><path d="M7 12.5l3 3 7-7" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="ic-arrow-right" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="currentColor"/><path d="M9 7l6 5-6 5" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="ic-warning" viewBox="0 0 24 24"><path d="M12 2 1 21h22L12 2z" fill="#F5C518" stroke="#C79A00" stroke-width="1"/><rect x="11" y="9" width="2" height="6" rx="1" fill="#5A4300"/><circle cx="12" cy="18" r="1.3" fill="#5A4300"/></symbol>
@@ -101,152 +101,188 @@
   <symbol id="ic-house" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#E8837A"/><path d="M6 12.5 12 7l6 5.5M8 12v5h8v-5" fill="none" stroke="#fff" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></symbol>
   <symbol id="ic-plane" viewBox="0 0 24 24"><circle cx="12" cy="12" r="12" fill="#14794F"/><path d="M6 15l12-7-4 12-2-5-4-1z" fill="#fff"/></symbol>
 
+  <!-- ícones de traço (pílulas do hero, faixa de confiança, chips, pagamento) -->
+  <symbol id="st-piggy" viewBox="0 0 24 24"><path d="M4 12.5c0-3.5 3-6 7.5-6 2.4 0 4.3.9 5.5 2.2h2c.6 0 1 .6.7 1.1l-1 1.7c.3.7.5 1.4.5 2.2v1.3c0 .5-.2.9-.6 1.2l-1.4 1v2.3h-2v-1.8h-4v1.8h-2v-2.2c-2.7-.7-4.7-2.5-4.7-4.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="15" cy="11.5" r=".9" fill="currentColor"/><path d="M4 12.5 2 12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="st-heart-hands" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-9.3-9C1.4 8.4 3 5 6.3 5c1.9 0 3.2 1 3.7 2 .5-1 1.8-2 3.7-2 3.3 0 4.9 3.4 3.6 6-2.3 4.6-9.3 9-9.3 9z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+  <symbol id="st-sprout" viewBox="0 0 24 24"><path d="M12 21v-9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M12 12c0-4 3-6 7-6 0 4-3 6-7 6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M12 15c0-3.2-2.4-4.8-5.5-4.8 0 3.2 2.4 4.8 5.5 4.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="st-shield-check" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4.5-3 7.7-7 10-4-2.3-7-5.5-7-10V6l7-3z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="st-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+  <symbol id="st-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="st-card" viewBox="0 0 24 24"><rect x="2.5" y="5.5" width="19" height="13" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M2.5 10h19" stroke="currentColor" stroke-width="1.6"/><path d="M6 14.5h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="st-pix" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.6" transform="rotate(45 12 12)"/><circle cx="12" cy="12" r="2" fill="currentColor"/></symbol>
+  <symbol id="st-badge-percent" viewBox="0 0 24 24"><path d="M12 2l2.4 1.4 2.8-.3 1 2.6 2.4 1.5-.7 2.8.7 2.8-2.4 1.5-1 2.6-2.8-.3L12 18l-2.4 1.6-2.8.3-1-2.6-2.4-1.5.7-2.8-.7-2.8 2.4-1.5 1-2.6 2.8.3L12 2z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M9 15l6-6M9.5 9.5h.01M14.5 14.5h.01" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="st-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+
+  <!-- ícones dos entregáveis (mantidos como apoio textual pequeno, mockups fazem o trabalho visual) -->
   <symbol id="dev-phone" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><line x1="10" y1="19" x2="14" y2="19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
-  <symbol id="dev-chart" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6 15l3-4 3 2 4-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  <symbol id="dev-scale" viewBox="0 0 24 24"><path d="M12 3v18M4 8l4-3 4 3-4 12M20 8l-4-3-4 3 4 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M3 8h6M15 8h6" stroke="currentColor" stroke-width="1.5"/></symbol>
-  <symbol id="dev-board" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="10" r="2" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M12 14l3-3 4 4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 20h20" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
-  <symbol id="dev-sheet" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 9h18M9 3v18" stroke="currentColor" stroke-width="1.4"/></symbol>
-  <symbol id="dev-play" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 9l6 3-6 3V9z" fill="currentColor"/></symbol>
 
   <symbol id="dev-collage" viewBox="0 0 320 190">
     <defs>
       <linearGradient id="scrGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0D67A"/><stop offset="1" stop-color="#C39A22"/></linearGradient>
       <linearGradient id="scrBlue" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3E6FCB"/><stop offset="1" stop-color="#0F2A57"/></linearGradient>
     </defs>
-    <g transform="rotate(-8 90 95)">
-      <rect x="30" y="30" width="120" height="80" rx="6" fill="#0B2040" stroke="#1E4FA3" stroke-width="2"/>
-      <rect x="36" y="36" width="108" height="60" rx="2" fill="url(#scrBlue)"/>
-      <rect x="42" y="42" width="50" height="6" rx="3" fill="#fff" opacity=".85"/>
-      <rect x="42" y="52" width="80" height="4" rx="2" fill="#fff" opacity=".55"/>
-      <rect x="42" y="60" width="60" height="4" rx="2" fill="#fff" opacity=".55"/>
-      <rect x="42" y="76" width="30" height="14" rx="3" fill="url(#scrGold)"/>
-    </g>
-    <g transform="rotate(6 210 90)">
-      <rect x="150" y="18" width="140" height="94" rx="7" fill="#0B2040" stroke="#1E4FA3" stroke-width="2"/>
-      <rect x="157" y="25" width="126" height="70" rx="2" fill="#0F2A57"/>
-      <rect x="166" y="34" width="60" height="7" rx="3.5" fill="url(#scrGold)"/>
-      <rect x="166" y="47" width="108" height="5" rx="2.5" fill="#fff" opacity=".5"/>
-      <rect x="166" y="57" width="108" height="5" rx="2.5" fill="#fff" opacity=".5"/>
-      <rect x="166" y="67" width="70" height="5" rx="2.5" fill="#fff" opacity=".5"/>
-      <rect x="166" y="80" width="40" height="10" rx="3" fill="#14794F"/>
-    </g>
-    <g transform="rotate(-4 260 150)">
-      <rect x="225" y="95" width="62" height="88" rx="10" fill="#0B2040" stroke="#1E4FA3" stroke-width="2"/>
-      <rect x="231" y="105" width="50" height="68" rx="3" fill="url(#scrBlue)"/>
-      <circle cx="256" cy="120" r="8" fill="url(#scrGold)"/>
-      <rect x="238" y="134" width="36" height="4" rx="2" fill="#fff" opacity=".6"/>
-      <rect x="238" y="142" width="36" height="4" rx="2" fill="#fff" opacity=".6"/>
-      <rect x="238" y="150" width="24" height="4" rx="2" fill="#fff" opacity=".6"/>
-    </g>
   </symbol>
 </svg>
 
 <a href="#preco" class="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:text-navy focus:p-3">Pular para a oferta</a>
 
 <!-- ============ 1. HERO ============ -->
-<header class="w-full bg-gradient-to-b from-cream to-slate">
-  <div class="max-w-[480px] mx-auto px-5 pt-7 pb-9 text-center">
-    <svg viewBox="130 60 640 180" role="img" aria-label="Dinheiro do Casal" class="mx-auto h-14 w-auto mb-5">
-      <g transform="translate(0,-300)"><g transform="translate(150,368) scale(1.35)">
-        <defs>
-          <linearGradient id="gLogoH" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0D67A"/><stop offset="1" stop-color="#C39A22"/></linearGradient>
-          <clipPath id="gLogocH"><circle cx="82" cy="105" r="15"/></clipPath>
-        </defs>
-        <circle cx="52" cy="70" r="44" fill="none" stroke="#1E4FA3" stroke-width="14"/>
-        <circle cx="112" cy="70" r="44" fill="none" stroke="url(#gLogoH)" stroke-width="14"/>
-        <g clip-path="url(#gLogocH)"><circle cx="52" cy="70" r="44" fill="none" stroke="#1E4FA3" stroke-width="14"/></g>
-        <path d="M84 40 A44 44 0 0 1 140 44" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2.5" stroke-linecap="round"/>
-        <g transform="translate(112,22)">
-          <path d="M0 -13 L11 -3 L0 11 L-11 -3 Z" fill="#FFFFFF" stroke="url(#gLogoH)" stroke-width="3" stroke-linejoin="round"/>
-          <path d="M-11 -3 H11 M-4 -3 L0 -13 L4 -3 M-4 -3 L0 11 L4 -3" fill="none" stroke="url(#gLogoH)" stroke-width="1.4" stroke-linejoin="round"/>
-        </g></g>
-      <text x="400" y="438" font-size="76" fill="#0F2A57" style="font-family:'Poppins','Montserrat','Helvetica Neue',Arial,sans-serif;font-weight:800;letter-spacing:-1">Dinheiro</text>
-      <text x="400" y="506" font-size="76" fill="#0F2A57" style="font-family:'Poppins','Montserrat','Helvetica Neue',Arial,sans-serif;font-weight:800;letter-spacing:-1"><tspan font-size="34" dy="-4">do</tspan><tspan dx="10" dy="4">Casal</tspan></text>
-      </g>
-    </svg>
+<header class="w-full bg-gradient-to-b from-cream via-cream to-slate relative overflow-hidden">
+  <!-- textura sutil de fundo (padrão de moedas/alianças em baixa opacidade) -->
+  <svg class="pointer-events-none absolute -top-10 -left-16 w-72 h-72 text-blue/[.05] lg:w-96 lg:h-96" viewBox="0 0 200 200" aria-hidden="true"><circle cx="70" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="16"/><circle cx="120" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="16"/></svg>
+  <svg class="pointer-events-none absolute -bottom-16 -right-10 w-64 h-64 text-gold/[.08] lg:w-80 lg:h-80" viewBox="0 0 200 200" aria-hidden="true"><circle cx="70" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="16"/><circle cx="120" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="16"/></svg>
 
-    <h1 class="font-sans font-extrabold text-[1.6rem] leading-tight text-navy">
-      Baixe agora o <span class="text-navy">Dinheiro do Casal</span>, acabe com as brigas e
-      <span class="text-wine">faça sobrar dinheiro todo mês.</span>
-    </h1>
+  <div class="max-w-(--container-content) mx-auto px-5 lg:px-10 pt-7 lg:pt-12 pb-10 lg:pb-16 relative">
+    <div class="grid lg:grid-cols-2 lg:gap-14 lg:items-center">
+      <!-- coluna de texto -->
+      <div class="text-center lg:text-left">
+        <div class="flex justify-center lg:justify-start">
+          <svg viewBox="130 60 640 180" role="img" aria-label="Dinheiro do Casal" class="h-12 lg:h-14 w-auto mb-6">
+            <g transform="translate(0,-300)"><g transform="translate(150,368) scale(1.35)">
+              <defs>
+                <linearGradient id="gLogoH" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0D67A"/><stop offset="1" stop-color="#C39A22"/></linearGradient>
+                <clipPath id="gLogocH"><circle cx="82" cy="105" r="15"/></clipPath>
+              </defs>
+              <circle cx="52" cy="70" r="44" fill="none" stroke="#1E4FA3" stroke-width="14"/>
+              <circle cx="112" cy="70" r="44" fill="none" stroke="url(#gLogoH)" stroke-width="14"/>
+              <g clip-path="url(#gLogocH)"><circle cx="52" cy="70" r="44" fill="none" stroke="#1E4FA3" stroke-width="14"/></g>
+              <path d="M84 40 A44 44 0 0 1 140 44" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2.5" stroke-linecap="round"/>
+              <g transform="translate(112,22)">
+                <path d="M0 -13 L11 -3 L0 11 L-11 -3 Z" fill="#FFFFFF" stroke="url(#gLogoH)" stroke-width="3" stroke-linejoin="round"/>
+                <path d="M-11 -3 H11 M-4 -3 L0 -13 L4 -3 M-4 -3 L0 11 L4 -3" fill="none" stroke="url(#gLogoH)" stroke-width="1.4" stroke-linejoin="round"/>
+              </g></g>
+            <text x="400" y="438" font-size="76" fill="#0F2A57" style="font-family:'Poppins','Montserrat','Helvetica Neue',Arial,sans-serif;font-weight:800;letter-spacing:-1">Dinheiro</text>
+            <text x="400" y="506" font-size="76" fill="#0F2A57" style="font-family:'Poppins','Montserrat','Helvetica Neue',Arial,sans-serif;font-weight:800;letter-spacing:-1"><tspan font-size="34" dy="-4">do</tspan><tspan dx="10" dy="4">Casal</tspan></text>
+            </g>
+          </svg>
+        </div>
 
-    <p class="mt-3 text-sm font-medium text-blue">a planilha que mostra para onde vai cada real</p>
+        <h1 class="font-serif font-semibold text-[clamp(1.9rem,4.2vw,3.1rem)] leading-[1.12] text-navy">
+          Baixe agora o Dinheiro do Casal, acabe com as brigas e
+          <span class="text-wine">faça sobrar dinheiro todo mês.</span>
+        </h1>
 
-    <div class="mt-5 flex flex-wrap justify-center gap-2">
-      <span class="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-gold to-gold-dark text-navy text-xs font-semibold px-3.5 py-1.5 shadow-sm">
-        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#ic-dollar"/></svg> Junte mais dinheiro
-      </span>
-      <span class="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-gold to-gold-dark text-navy text-xs font-semibold px-3.5 py-1.5 shadow-sm">
-        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#ic-house"/></svg> Acabe com as brigas
-      </span>
-      <span class="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-gold to-gold-dark text-navy text-xs font-semibold px-3.5 py-1.5 shadow-sm">
-        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24"><use href="#ic-plane"/></svg> Prospere financeiramente
-      </span>
+        <p class="mt-4 text-base lg:text-lg font-medium text-blue">a planilha que mostra para onde vai cada real</p>
+
+        <div class="mt-6 flex flex-wrap justify-center lg:justify-start gap-2.5">
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-navy text-xs font-semibold px-3.5 py-1.5 shadow-sm">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><use href="#st-piggy"/></svg> Junte mais dinheiro
+          </span>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-navy text-xs font-semibold px-3.5 py-1.5 shadow-sm">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><use href="#st-heart-hands"/></svg> Acabe com as brigas
+          </span>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-navy text-xs font-semibold px-3.5 py-1.5 shadow-sm">
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><use href="#st-sprout"/></svg> Prospere financeiramente
+          </span>
+        </div>
+
+        <p class="mt-5 text-sm lg:text-base text-body max-w-md mx-auto lg:mx-0">
+          Junto com a planilha, você terá acesso a
+          <strong class="text-navy">uma aula completa de 2 horas</strong> para destravar as finanças do casal.
+        </p>
+
+        <div class="mt-7 hidden lg:block">
+          <a href="#" class="js-buy btn inline-block rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-navy font-bold text-base py-4 px-9 shadow-lg shadow-gold/20">
+            SIM, EU QUERO O DINHEIRO DO CASAL
+          </a>
+        </div>
+      </div>
+
+      <!-- coluna de imagem -->
+      <div class="relative mt-8 lg:mt-0 mx-auto max-w-[340px] lg:max-w-none">
+        <picture>
+          <source media="(min-width:1024px)" srcset="/assets/img/hero-casal-desktop-800.webp 800w, /assets/img/hero-casal-desktop-1200.webp 1200w, /assets/img/hero-casal-desktop-1600.webp 1600w" sizes="(min-width:1280px) 560px, 46vw">
+          <img src="/assets/img/hero-casal-mobile-800.webp" srcset="/assets/img/hero-casal-mobile-480.webp 480w, /assets/img/hero-casal-mobile-800.webp 800w, /assets/img/hero-casal-mobile-1000.webp 1000w" sizes="(min-width:1024px) 46vw, 90vw" alt="Casal sorrindo, olhando juntos para o notebook, organizando as finanças em casa" width="1000" height="1143" class="rounded-[2rem] w-full h-auto shadow-xl shadow-navy/15 aspect-[1000/1143] lg:aspect-[1200/873] object-cover" fetchpriority="high">
+        </picture>
+
+        <span class="float-badge d1 absolute -left-4 top-8 w-11 h-11 lg:w-12 lg:h-12 drop-shadow-md"><svg class="w-full h-full" viewBox="0 0 24 24"><use href="#ic-dollar"/></svg></span>
+        <span class="float-badge d2 absolute -right-4 top-20 w-11 h-11 lg:w-12 lg:h-12 drop-shadow-md"><svg class="w-full h-full" viewBox="0 0 24 24"><use href="#ic-rings"/></svg></span>
+        <span class="float-badge d3 absolute -left-3 bottom-20 w-11 h-11 lg:w-12 lg:h-12 drop-shadow-md"><svg class="w-full h-full" viewBox="0 0 24 24"><use href="#ic-house"/></svg></span>
+        <span class="float-badge d4 absolute -right-3 bottom-6 w-11 h-11 lg:w-12 lg:h-12 drop-shadow-md"><svg class="w-full h-full" viewBox="0 0 24 24"><use href="#ic-plane"/></svg></span>
+      </div>
     </div>
 
-    <p class="mt-4 text-sm text-body">
-      Junto com a planilha, você terá acesso a várias aulas para
-      <strong class="text-navy">destravar as finanças do casal.</strong>
-    </p>
-
-    <div class="relative mt-7 mx-auto max-w-[320px]">
-      <img src="/assets/img/hero-casal.webp" alt="Casal sorrindo, unidos, representando harmonia financeira no relacionamento" width="900" height="1242" class="rounded-3xl w-full h-auto shadow-lg" fetchpriority="high">
-
-      <span class="float-badge d1 absolute -left-4 top-6 w-10 h-10 drop-shadow-md"><svg class="w-full h-full" viewBox="0 0 24 24"><use href="#ic-dollar"/></svg></span>
-      <span class="float-badge d2 absolute -right-4 top-16 w-10 h-10 drop-shadow-md"><svg class="w-full h-full" viewBox="0 0 24 24"><use href="#ic-rings"/></svg></span>
-      <span class="float-badge d3 absolute -left-3 bottom-16 w-10 h-10 drop-shadow-md"><svg class="w-full h-full" viewBox="0 0 24 24"><use href="#ic-house"/></svg></span>
-      <span class="float-badge d4 absolute -right-3 bottom-4 w-10 h-10 drop-shadow-md"><svg class="w-full h-full" viewBox="0 0 24 24"><use href="#ic-plane"/></svg></span>
+    <div class="mt-8 flex justify-center lg:hidden">
+      <a href="#" class="js-buy btn inline-block w-full max-w-[320px] text-center rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-navy font-bold text-base py-4 px-6 shadow-lg shadow-gold/20">
+        SIM, EU QUERO O DINHEIRO DO CASAL
+      </a>
     </div>
   </div>
 </header>
 
+<!-- sentinela para a barra fixa mobile aparecer a partir daqui -->
+<div id="hero-end"></div>
+
+<!-- ============ FAIXA DE CONFIANÇA (novo) ============ -->
+<div class="w-full bg-white border-y border-navy/[.06]">
+  <div class="max-w-(--container-content) mx-auto px-5 lg:px-10 py-5 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-10 text-center">
+    <div class="flex items-center gap-2.5 text-sm font-semibold text-navy">
+      <svg class="w-5 h-5 text-blue shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"><use href="#st-shield-check"/></svg>
+      Pagamento seguro pela Hotmart
+    </div>
+    <div class="flex items-center gap-2.5 text-sm font-semibold text-navy">
+      <svg class="w-5 h-5 text-wine shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"><use href="#st-badge-percent"/></svg>
+      Garantia de 7 dias
+    </div>
+    <div class="flex items-center gap-2.5 text-sm font-semibold text-navy">
+      <svg class="w-5 h-5 text-green shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"><use href="#st-bolt"/></svg>
+      Acesso imediato
+    </div>
+  </div>
+</div>
+
 <main>
 <!-- ============ 2. PARA QUEM É ============ -->
-<section class="w-full bg-gradient-to-b from-wine to-[#7C2C45] text-white">
-  <div class="max-w-[480px] mx-auto px-5 pt-10 pb-8">
-    <h2 class="font-sans font-bold text-xl text-center leading-snug">
-      O Dinheiro do Casal é para casais que:
-    </h2>
+<section class="w-full bg-gradient-to-br from-wine to-wine2 text-white relative overflow-hidden">
+  <svg class="pointer-events-none absolute top-0 right-0 w-80 h-80 text-white/[.05]" viewBox="0 0 200 200" aria-hidden="true"><circle cx="70" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="18"/><circle cx="120" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="18"/></svg>
+  <div class="max-w-(--container-content) mx-auto px-5 lg:px-10 pt-12 pb-10 lg:py-16 relative">
+    <div class="grid lg:grid-cols-2 lg:gap-16 lg:items-center">
+      <div class="reveal">
+        <h2 class="font-serif font-semibold text-2xl lg:text-3xl text-center lg:text-left leading-snug">
+          O Dinheiro do Casal é para casais que:
+        </h2>
 
-    <ul class="mt-6 space-y-3.5">
-      <li class="flex items-start gap-3">
-        <svg class="w-5 h-5 shrink-0 mt-0.5 text-gold"><use href="#ic-check"/></svg>
-        <span class="text-sm font-medium">Tentam economizar, mas continuam no vermelho</span>
-      </li>
-      <li class="flex items-start gap-3">
-        <svg class="w-5 h-5 shrink-0 mt-0.5 text-gold"><use href="#ic-check"/></svg>
-        <span class="text-sm font-medium">Sentem que trabalham pela sobrevivência</span>
-      </li>
-      <li class="flex items-start gap-3">
-        <svg class="w-5 h-5 shrink-0 mt-0.5 text-gold"><use href="#ic-check"/></svg>
-        <span class="text-sm font-medium">Querem trocar de carro, reformar a casa e viajar</span>
-      </li>
-      <li class="flex items-start gap-3">
-        <svg class="w-5 h-5 shrink-0 mt-0.5 text-gold"><use href="#ic-check"/></svg>
-        <span class="text-sm font-medium">Brigam constantemente por causa de dinheiro</span>
-      </li>
-      <li class="flex items-start gap-3">
-        <svg class="w-5 h-5 shrink-0 mt-0.5 text-gold"><use href="#ic-check"/></svg>
-        <span class="text-sm font-medium">Têm medo de se separar por causa dos problemas financeiros</span>
-      </li>
-      <li class="flex items-start gap-3">
-        <svg class="w-5 h-5 shrink-0 mt-0.5 text-gold"><use href="#ic-check"/></svg>
-        <span class="text-sm font-medium">Têm histórico na família de casais que passam por situações parecidas</span>
-      </li>
-    </ul>
+        <ul class="mt-6 space-y-3.5 max-w-md mx-auto lg:mx-0">
+          <li class="flex items-start gap-3">
+            <svg class="w-5 h-5 shrink-0 mt-0.5 text-gold-light"><use href="#ic-check"/></svg>
+            <span class="text-sm lg:text-base font-medium">Tentam economizar, mas continuam no vermelho</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <svg class="w-5 h-5 shrink-0 mt-0.5 text-gold-light"><use href="#ic-check"/></svg>
+            <span class="text-sm lg:text-base font-medium">Sentem que trabalham pela sobrevivência</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <svg class="w-5 h-5 shrink-0 mt-0.5 text-gold-light"><use href="#ic-check"/></svg>
+            <span class="text-sm lg:text-base font-medium">Querem trocar de carro, reformar a casa e viajar</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <svg class="w-5 h-5 shrink-0 mt-0.5 text-gold-light"><use href="#ic-check"/></svg>
+            <span class="text-sm lg:text-base font-medium">Brigam constantemente por causa de dinheiro</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <svg class="w-5 h-5 shrink-0 mt-0.5 text-gold-light"><use href="#ic-check"/></svg>
+            <span class="text-sm lg:text-base font-medium">Têm medo de se separar por causa dos problemas financeiros</span>
+          </li>
+          <li class="flex items-start gap-3">
+            <svg class="w-5 h-5 shrink-0 mt-0.5 text-gold-light"><use href="#ic-check"/></svg>
+            <span class="text-sm lg:text-base font-medium">Têm histórico na família de casais que passam por situações parecidas</span>
+          </li>
+        </ul>
+      </div>
 
-    <div class="relative mt-7 mx-auto max-w-[260px] aspect-square rounded-full overflow-hidden">
-      <svg class="absolute inset-0 w-full h-full text-white/10" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 88C25 70 8 52 8 32 8 16 20 6 34 6c8 0 14 4 16 10 2-6 8-10 16-10 14 0 26 10 26 26 0 20-17 38-42 56z" fill="currentColor"/></svg>
-      <img src="/assets/img/paraquem-casal.webp" alt="Casal abraçado e sorrindo, próximo, demonstrando cumplicidade" width="900" height="1350" loading="lazy" class="relative w-full h-full object-cover">
+      <div class="relative mt-9 lg:mt-0 mx-auto max-w-[280px] lg:max-w-[380px] aspect-square reveal">
+        <svg class="absolute inset-0 w-full h-full text-white/10 scale-110" viewBox="0 0 100 100" aria-hidden="true"><path d="M50 88C25 70 8 52 8 32 8 16 20 6 34 6c8 0 14 4 16 10 2-6 8-10 16-10 14 0 26 10 26 26 0 20-17 38-42 56z" fill="currentColor"/></svg>
+        <img src="/assets/img/paraquem-casal-800.webp" srcset="/assets/img/paraquem-casal-480.webp 480w, /assets/img/paraquem-casal-800.webp 800w, /assets/img/paraquem-casal-1200.webp 1200w" sizes="(min-width:1024px) 380px, 280px" alt="Casal abraçado e sorrindo, próximo, demonstrando cumplicidade" width="900" height="1350" loading="lazy" class="relative w-full h-full object-cover rounded-full ring-4 ring-white/15 shadow-2xl">
+      </div>
     </div>
   </div>
 
   <!-- ============ 3. CARD DE IDENTIFICAÇÃO ============ -->
   <div class="w-full bg-slate">
-    <div class="max-w-[480px] mx-auto px-5 -mt-8 pb-8">
-      <div class="bg-white rounded-2xl shadow-lg p-4 flex items-start gap-3">
+    <div class="max-w-[560px] mx-auto px-5 -mt-8 pb-8 relative z-10">
+      <div class="bg-white rounded-2xl shadow-xl shadow-navy/10 p-5 flex items-start gap-3 reveal">
         <svg class="w-7 h-7 shrink-0 text-wine"><use href="#ic-arrow-right"/></svg>
-        <p class="text-sm font-semibold text-navy">
+        <p class="text-sm lg:text-base font-semibold text-navy">
           Se você se identifica com <span class="text-wine">ao menos 2 itens acima</span>, o Dinheiro do Casal é para você e seu marido/esposa!
         </p>
       </div>
@@ -256,103 +292,132 @@
 
 <!-- ============ 4. DOR ============ -->
 <section class="w-full bg-slate">
-  <div class="max-w-[480px] mx-auto px-5 pt-9 pb-9">
-    <h2 class="font-sans font-bold text-xl text-center leading-snug text-wine">
+  <div class="max-w-(--container-content) mx-auto px-5 lg:px-10 pt-9 pb-9 lg:py-16">
+    <h2 class="font-serif font-semibold text-2xl lg:text-3xl text-center leading-snug text-wine2 max-w-2xl mx-auto reveal">
       A cada dia que passa, vocês brigam mais por causa de dinheiro e sofrem com problemas do tipo:
     </h2>
 
-    <div class="relative mt-7 mx-auto max-w-[340px]">
-      <img src="/assets/img/dor-casal.webp" alt="Casal em tensão analisando contas: ele mexendo no celular, ela segurando papéis, expressão cansada" width="1000" height="1033" loading="lazy" class="rounded-3xl w-full h-auto shadow-lg">
+    <div class="relative mt-9 mx-auto max-w-[340px] lg:max-w-[440px] reveal">
+      <img src="/assets/img/dor-casal-800.webp" srcset="/assets/img/dor-casal-480.webp 480w, /assets/img/dor-casal-800.webp 800w, /assets/img/dor-casal-1200.webp 1200w" sizes="(min-width:1024px) 440px, 340px" alt="Casal em tensão analisando contas: ele mexendo no celular, ela segurando papéis, expressão cansada" width="800" height="696" loading="lazy" class="rounded-[2rem] w-full h-auto shadow-xl shadow-navy/10">
 
-      <div class="speech tail-tl absolute -top-4 left-2 max-w-[130px] rounded-xl px-3 py-2 text-[11px] font-bold leading-tight shadow-md">
+      <div class="speech tail-tl absolute -top-4 left-2 max-w-[135px] rounded-xl px-3 py-2 text-[11px] font-bold leading-tight shadow-md">
         A gente está <span class="text-navy">se distanciando</span> como casal
       </div>
-      <div class="speech tail-tr absolute -top-4 right-2 max-w-[135px] rounded-xl px-3 py-2 text-[11px] font-bold leading-tight shadow-md">
+      <div class="speech tail-tr absolute -top-4 right-2 max-w-[140px] rounded-xl px-3 py-2 text-[11px] font-bold leading-tight shadow-md">
         A gente ganha bem, mas <span class="text-navy">não sei para onde vai esse dinheiro</span>
       </div>
-      <div class="speech tail-bl absolute -bottom-4 left-1 max-w-[130px] rounded-xl px-3 py-2 text-[11px] font-bold leading-tight shadow-md">
+      <div class="speech tail-bl absolute -bottom-4 left-1 max-w-[135px] rounded-xl px-3 py-2 text-[11px] font-bold leading-tight shadow-md">
         Eu queria que você <span class="text-navy">pensasse mais no futuro</span> como eu
       </div>
-      <div class="speech tail-br absolute -bottom-4 right-1 max-w-[135px] rounded-xl px-3 py-2 text-[11px] font-bold leading-tight shadow-md">
+      <div class="speech tail-br absolute -bottom-4 right-1 max-w-[140px] rounded-xl px-3 py-2 text-[11px] font-bold leading-tight shadow-md">
         Você <span class="text-navy">só gasta com besteira</span> e eu tenho que economizar
       </div>
     </div>
   </div>
 
   <!-- ============ 5. CARD EMOCIONAL ============ -->
-  <div class="w-full bg-gradient-to-r from-coral to-wine">
-    <div class="max-w-[480px] mx-auto px-6 py-8 text-center text-white">
-      <p class="font-bold text-lg">É horrível se sentir assim, né?</p>
-      <p class="mt-3 text-sm leading-relaxed">
+  <div class="w-full bg-gradient-to-r from-coral to-wine2">
+    <div class="max-w-[640px] mx-auto px-6 py-10 lg:py-14 text-center text-white reveal">
+      <p class="font-serif font-semibold text-xl lg:text-2xl">É horrível se sentir assim, né?</p>
+      <p class="mt-4 text-sm lg:text-base leading-relaxed">
         Viver um relacionamento onde a falta de dinheiro está destruindo a convivência. Ao invés de ficarem juntos, se amando, vocês só vivem brigando…
-        <strong class="block mt-2">Eu tenho certeza que você não quer mais passar por isso.</strong>
+        <strong class="block mt-3 font-serif font-semibold text-base lg:text-lg">Eu tenho certeza que você não quer mais passar por isso.</strong>
       </p>
     </div>
   </div>
 
   <!-- ============ 6. ALERTA ============ -->
-  <div class="max-w-[480px] mx-auto px-5 py-8">
-    <div class="rounded-2xl bg-[#FFF6D8] border border-[#F0DE9E] p-5 text-center">
-      <svg class="w-8 h-8 mx-auto mb-2"><use href="#ic-warning"/></svg>
-      <p class="font-bold text-navy text-sm">Entenda de uma vez por todas…</p>
-      <p class="mt-2 text-sm leading-relaxed text-navy/90">
+  <div class="max-w-[640px] mx-auto px-5 py-9 lg:py-12">
+    <div class="rounded-3xl bg-white border border-gold/30 shadow-lg shadow-navy/5 p-6 lg:p-8 text-center reveal">
+      <div class="w-12 h-12 mx-auto mb-3 rounded-full bg-[#FFF6D8] flex items-center justify-center">
+        <svg class="w-7 h-7"><use href="#ic-warning"/></svg>
+      </div>
+      <p class="font-serif font-semibold text-navy text-lg lg:text-xl">Entenda de uma vez por todas…</p>
+      <p class="mt-3 text-sm lg:text-base leading-relaxed text-body">
         Isso só acontece porque você não tem um método financeiro eficaz e fica usando as notas do celular, aplicativos gratuitos e outras ferramentas que não funcionam.
-        <strong class="underline decoration-wine/60">Desse jeito, você vai destruir o seu controle financeiro.</strong>
+        <strong class="text-navy">Desse jeito, você vai destruir o seu controle financeiro.</strong>
       </p>
     </div>
   </div>
 </section>
 
-<!-- ============ 7. ENTREGÁVEIS ============ -->
+<!-- ============ 7. VEJA POR DENTRO (novo) ============ -->
 <section class="w-full bg-white">
-  <div class="max-w-[480px] mx-auto px-5 py-9">
-    <h2 class="font-sans font-bold text-xl text-center leading-snug text-navy">
+  <div class="max-w-(--container-content) mx-auto px-5 lg:px-10 py-10 lg:py-16">
+    <div class="grid lg:grid-cols-2 lg:gap-14 items-center">
+      <div class="text-center lg:text-left reveal order-2 lg:order-1">
+        <p class="text-xs font-bold tracking-wide text-wine uppercase mb-2">Veja por dentro</p>
+        <h2 class="font-serif font-semibold text-2xl lg:text-3xl text-navy leading-snug">
+          A planilha que mostra tudo, sem complicação
+        </h2>
+        <p class="mt-4 text-sm lg:text-base text-body max-w-md mx-auto lg:mx-0">
+          Assim que vocês preenchem o mês, o Painel do Mês mostra sozinho: quanto entrou, quanto saiu, o que sobrou e onde está indo cada categoria de gasto — com gráfico e tudo.
+        </p>
+        <ul class="mt-5 space-y-2.5 max-w-md mx-auto lg:mx-0 text-left inline-block">
+          <li class="flex items-center gap-2.5 text-sm text-navy font-medium">
+            <svg class="w-4.5 h-4.5 text-green shrink-0" viewBox="0 0 24 24"><use href="#ic-check"/></svg> Painel do Mês com gráfico automático
+          </li>
+          <li class="flex items-center gap-2.5 text-sm text-navy font-medium">
+            <svg class="w-4.5 h-4.5 text-green shrink-0" viewBox="0 0 24 24"><use href="#ic-check"/></svg> Divisão proporcional das contas do casal
+          </li>
+          <li class="flex items-center gap-2.5 text-sm text-navy font-medium">
+            <svg class="w-4.5 h-4.5 text-green shrink-0" viewBox="0 0 24 24"><use href="#ic-check"/></svg> Reserva de emergência com meta calculada
+          </li>
+        </ul>
+        <p class="mt-4 text-[11px] text-strike">Imagem ilustrativa, com dados de exemplo.</p>
+      </div>
+      <div class="order-1 lg:order-2 reveal">
+        <img src="/assets/img/mockups/veja-por-dentro.webp" alt="Prévia da planilha Dinheiro do Casal aberta em notebook e celular, mostrando o Painel do Mês" width="1100" height="720" loading="lazy" class="w-full h-auto">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. ENTREGÁVEIS ============ -->
+<section class="w-full bg-slate">
+  <div class="max-w-(--container-content) mx-auto px-5 lg:px-10 py-10 lg:py-16">
+    <h2 class="font-serif font-semibold text-2xl lg:text-3xl text-center leading-snug text-navy max-w-2xl mx-auto reveal">
       Isso é tudo que você vai ganhar ao adquirir o <span class="text-wine">Dinheiro do Casal</span>
     </h2>
 
-    <div class="mt-7 grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div class="rounded-2xl bg-slate p-4 text-center">
-        <svg class="w-9 h-9 mx-auto text-blue"><use href="#dev-phone"/></svg>
-        <p class="mt-3 font-bold text-sm text-navy">Guia da Paz Financeira no Relacionamento</p>
-        <p class="mt-1.5 text-xs leading-relaxed">Lista completa para identificar os pensamentos e hábitos que impedem o casal de enriquecer.</p>
+    <div class="mt-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="rounded-3xl bg-white shadow-sm p-5 text-center flex flex-col items-center reveal">
+        <img src="/assets/img/mockups/mockup-01-guia.webp" alt="Mockup do e-book Guia da Paz Financeira no Relacionamento" width="440" height="420" loading="lazy" class="w-full max-w-[220px] h-auto -mt-2 mb-1">
+        <p class="mt-2 font-bold text-sm lg:text-base text-navy">Guia da Paz Financeira no Relacionamento</p>
+        <p class="mt-1.5 text-xs lg:text-sm leading-relaxed text-body">Lista completa para identificar os pensamentos e hábitos que impedem o casal de enriquecer.</p>
       </div>
-      <div class="rounded-2xl bg-slate p-4 text-center">
-        <svg class="w-9 h-9 mx-auto text-blue"><use href="#dev-chart"/></svg>
-        <p class="mt-3 font-bold text-sm text-navy">Raio-X Financeiro: Veja Além dos Gastos do Mês</p>
-        <p class="mt-1.5 text-xs leading-relaxed">Tabela para identificar o que melhorar hoje para atingir os sonhos de curto, médio e longo prazo.</p>
+      <div class="rounded-3xl bg-white shadow-sm p-5 text-center flex flex-col items-center reveal">
+        <img src="/assets/img/mockups/mockup-02-raiox.webp" alt="Mockup do e-book Raio-X Financeiro" width="440" height="420" loading="lazy" class="w-full max-w-[220px] h-auto -mt-2 mb-1">
+        <p class="mt-2 font-bold text-sm lg:text-base text-navy">Raio-X Financeiro: Veja Além dos Gastos do Mês</p>
+        <p class="mt-1.5 text-xs lg:text-sm leading-relaxed text-body">Tabela para identificar o que melhorar hoje para atingir os sonhos de curto, médio e longo prazo.</p>
       </div>
-      <div class="rounded-2xl bg-slate p-4 text-center">
-        <svg class="w-9 h-9 mx-auto text-blue"><use href="#dev-scale"/></svg>
-        <p class="mt-3 font-bold text-sm text-navy">Balança do Dinheiro: o equilíbrio entre sonhos e responsabilidades</p>
-        <p class="mt-1.5 text-xs leading-relaxed">Recurso para alinhar vontades e desejos do casal aos 3 propósitos do dinheiro: segurança financeira, realização de sonhos e generosidade.</p>
+      <div class="rounded-3xl bg-white shadow-sm p-5 text-center flex flex-col items-center reveal">
+        <img src="/assets/img/mockups/mockup-03-balanca.webp" alt="Mockup do e-book Balança do Dinheiro" width="440" height="420" loading="lazy" class="w-full max-w-[220px] h-auto -mt-2 mb-1">
+        <p class="mt-2 font-bold text-sm lg:text-base text-navy">Balança do Dinheiro: o equilíbrio entre sonhos e responsabilidades</p>
+        <p class="mt-1.5 text-xs lg:text-sm leading-relaxed text-body">Recurso para alinhar vontades e desejos do casal aos 3 propósitos do dinheiro: segurança financeira, realização de sonhos e generosidade.</p>
       </div>
-    </div>
-
-    <p class="text-center font-bold text-navy my-6">E tem mais…</p>
-
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-      <div class="rounded-2xl bg-slate p-4 text-center">
-        <svg class="w-9 h-9 mx-auto text-blue"><use href="#dev-board"/></svg>
-        <p class="mt-3 font-bold text-sm text-navy">Quadro dos Sonhos do Casal</p>
-        <p class="mt-1.5 text-xs leading-relaxed">Painel para registrar e priorizar os sonhos do casal, com valores e prazos.</p>
+      <div class="rounded-3xl bg-white shadow-sm p-5 text-center flex flex-col items-center reveal">
+        <img src="/assets/img/mockups/mockup-04-sonhos.webp" alt="Mockup do e-book Quadro dos Sonhos do Casal" width="440" height="420" loading="lazy" class="w-full max-w-[220px] h-auto -mt-2 mb-1">
+        <p class="mt-2 font-bold text-sm lg:text-base text-navy">Quadro dos Sonhos do Casal</p>
+        <p class="mt-1.5 text-xs lg:text-sm leading-relaxed text-body">Painel para registrar e priorizar os sonhos do casal, com valores e prazos.</p>
       </div>
-      <div class="rounded-2xl bg-slate p-4 text-center">
-        <svg class="w-9 h-9 mx-auto text-blue"><use href="#dev-sheet"/></svg>
-        <p class="mt-3 font-bold text-sm text-navy">Dinheiro do Casal (a planilha)</p>
-        <p class="mt-1.5 text-xs leading-relaxed">Com o propósito do casal alinhado, vocês preenchem a planilha e prosperam de forma saudável, intencional e direcionada.</p>
+      <div class="rounded-3xl bg-white shadow-sm p-5 text-center flex flex-col items-center reveal">
+        <img src="/assets/img/mockups/mockup-05-planilha.webp" alt="Mockup da planilha Dinheiro do Casal em notebook" width="440" height="420" loading="lazy" class="w-full max-w-[220px] h-auto -mt-2 mb-1">
+        <p class="mt-2 font-bold text-sm lg:text-base text-navy">Dinheiro do Casal (a planilha)</p>
+        <p class="mt-1.5 text-xs lg:text-sm leading-relaxed text-body">Com o propósito do casal alinhado, vocês preenchem a planilha e prosperam de forma saudável, intencional e direcionada.</p>
       </div>
-      <div class="rounded-2xl bg-slate p-4 text-center">
-        <svg class="w-9 h-9 mx-auto text-blue"><use href="#dev-play"/></svg>
-        <p class="mt-3 font-bold text-sm text-navy">Aula: Mentalidade Financeira do Casal (2h)</p>
-        <p class="mt-1.5 text-xs leading-relaxed">Videoaulas práticas, gravadas pelo Márcio, para destravar a vida financeira e alcançar os maiores objetivos do casal.</p>
+      <div class="rounded-3xl bg-white shadow-sm p-5 text-center flex flex-col items-center reveal">
+        <img src="/assets/img/mockups/mockup-06-aula.webp" alt="Mockup em vídeo da aula Mentalidade Financeira do Casal" width="440" height="420" loading="lazy" class="w-full max-w-[220px] h-auto -mt-2 mb-1">
+        <p class="mt-2 font-bold text-sm lg:text-base text-navy">Aula: Mentalidade Financeira do Casal (2h)</p>
+        <p class="mt-1.5 text-xs lg:text-sm leading-relaxed text-body">Aula gravada pelo Márcio, dividida em módulos práticos, para destravar a vida financeira e alcançar os maiores objetivos do casal.</p>
       </div>
     </div>
   </div>
 
-  <!-- ============ 8. RECAP ============ -->
-  <div class="max-w-[480px] mx-auto px-5 pb-10">
-    <div class="rounded-2xl bg-slate p-5">
-      <h3 class="font-bold text-lg text-center text-navy">
+  <!-- ============ 9. RECAP ============ -->
+  <div class="max-w-[640px] mx-auto px-5 pb-12 lg:pb-16">
+    <div class="rounded-3xl bg-white shadow-lg shadow-navy/5 p-6 lg:p-8 reveal">
+      <h3 class="font-serif font-semibold text-lg lg:text-xl text-center text-navy">
         Recapitulando tudo o que <span class="text-green">você vai ganhar…</span>
       </h3>
 
@@ -383,170 +448,186 @@
         </li>
       </ul>
 
-      <p class="mt-5 text-center text-sm text-navy">
+      <p class="mt-5 text-center text-sm lg:text-base text-navy">
         Tudo isso deveria custar <strong class="text-wine">R$ 504,00</strong>. Mas hoje você vai ter acesso por apenas:
       </p>
     </div>
   </div>
 </section>
 
-<!-- ============ 9. BLOCO DE PREÇO ============ -->
-<section id="preco" class="w-full bg-gradient-to-b from-navy to-[#173B73]">
-  <div class="max-w-[480px] mx-auto px-5 py-10 text-center text-white">
+<!-- ============ 10. BLOCO DE PREÇO ============ -->
+<section id="preco" data-price-block class="w-full bg-gradient-to-br from-navy via-navy2 to-navy text-white relative overflow-hidden">
+  <svg class="pointer-events-none absolute -top-16 -right-16 w-96 h-96 text-white/[.04]" viewBox="0 0 200 200" aria-hidden="true"><circle cx="70" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="18"/><circle cx="120" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="18"/></svg>
+  <div class="max-w-(--container-content) mx-auto px-5 lg:px-10 py-12 lg:py-16">
+    <div class="grid lg:grid-cols-2 lg:gap-16 items-center">
+      <div class="reveal order-2 lg:order-1">
+        <img src="/assets/img/mockups/price-collage.webp" alt="Colagem: planilha Dinheiro do Casal aberta em notebook e celular, e os materiais em PDF" width="900" height="620" loading="lazy" class="w-full h-auto max-w-[440px] mx-auto lg:max-w-none">
+      </div>
 
-    <!-- Colagem de dispositivos (SVG próprio, definida no sprite) -->
-    <svg viewBox="0 0 320 190" class="w-full max-w-[300px] mx-auto mb-6" aria-hidden="true"><use href="#dev-collage"/></svg>
+      <div class="text-center lg:text-left order-1 lg:order-2 reveal">
+        <svg viewBox="130 60 640 180" role="img" aria-label="Dinheiro do Casal" class="h-9 mx-auto lg:mx-0 mb-5">
+          <g transform="translate(0,-300)"><g transform="translate(150,368) scale(1.35)">
+            <defs><clipPath id="gLogocP1"><circle cx="82" cy="105" r="15"/></clipPath></defs>
+            <circle cx="52" cy="70" r="44" fill="none" stroke="#5B8AE0" stroke-width="14"/>
+            <circle cx="112" cy="70" r="44" fill="none" stroke="url(#scrGold)" stroke-width="14"/>
+            <g clip-path="url(#gLogocP1)"><circle cx="52" cy="70" r="44" fill="none" stroke="#5B8AE0" stroke-width="14"/></g>
+            <path d="M84 40 A44 44 0 0 1 140 44" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2.5" stroke-linecap="round"/>
+            <g transform="translate(112,22)">
+              <path d="M0 -13 L11 -3 L0 11 L-11 -3 Z" fill="#FFFFFF" stroke="url(#scrGold)" stroke-width="3" stroke-linejoin="round"/>
+              <path d="M-11 -3 H11 M-4 -3 L0 -13 L4 -3 M-4 -3 L0 11 L4 -3" fill="none" stroke="url(#scrGold)" stroke-width="1.4" stroke-linejoin="round"/>
+            </g></g>
+          <text x="400" y="438" font-size="76" fill="#FFFFFF" style="font-family:'Poppins','Montserrat','Helvetica Neue',Arial,sans-serif;font-weight:800;letter-spacing:-1">Dinheiro</text>
+          <text x="400" y="506" font-size="76" fill="#FFFFFF" style="font-family:'Poppins','Montserrat','Helvetica Neue',Arial,sans-serif;font-weight:800;letter-spacing:-1"><tspan font-size="34" dy="-4">do</tspan><tspan dx="10" dy="4">Casal</tspan></text>
+          </g>
+        </svg>
 
-    <svg viewBox="130 60 640 180" role="img" aria-label="Dinheiro do Casal" class="mx-auto h-10 w-auto mb-4">
-      <g transform="translate(0,-300)"><g transform="translate(150,368) scale(1.35)">
-        <defs>
-          <clipPath id="gLogocP1"><circle cx="82" cy="105" r="15"/></clipPath>
-        </defs>
-        <circle cx="52" cy="70" r="44" fill="none" stroke="#5B8AE0" stroke-width="14"/>
-        <circle cx="112" cy="70" r="44" fill="none" stroke="url(#scrGold)" stroke-width="14"/>
-        <g clip-path="url(#gLogocP1)"><circle cx="52" cy="70" r="44" fill="none" stroke="#5B8AE0" stroke-width="14"/></g>
-        <path d="M84 40 A44 44 0 0 1 140 44" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2.5" stroke-linecap="round"/>
-        <g transform="translate(112,22)">
-          <path d="M0 -13 L11 -3 L0 11 L-11 -3 Z" fill="#FFFFFF" stroke="url(#scrGold)" stroke-width="3" stroke-linejoin="round"/>
-          <path d="M-11 -3 H11 M-4 -3 L0 -13 L4 -3 M-4 -3 L0 11 L4 -3" fill="none" stroke="url(#scrGold)" stroke-width="1.4" stroke-linejoin="round"/>
-        </g></g>
-      <text x="400" y="438" font-size="76" fill="#FFFFFF" style="font-family:'Poppins','Montserrat','Helvetica Neue',Arial,sans-serif;font-weight:800;letter-spacing:-1">Dinheiro</text>
-      <text x="400" y="506" font-size="76" fill="#FFFFFF" style="font-family:'Poppins','Montserrat','Helvetica Neue',Arial,sans-serif;font-weight:800;letter-spacing:-1"><tspan font-size="34" dy="-4">do</tspan><tspan dx="10" dy="4">Casal</tspan></text>
-      </g>
-    </svg>
+        <p class="text-sm font-semibold tracking-wide text-white/75">APENAS 9x DE</p>
+        <p class="font-serif font-semibold text-6xl lg:text-7xl text-gold-light leading-none my-2">R$ 8,80</p>
+        <p class="text-sm lg:text-base text-white/85">ou <strong class="text-white">R$ 67,00 à vista</strong> com desconto</p>
 
-    <p class="text-sm font-semibold tracking-wide text-white/80">APENAS 9x DE</p>
-    <p class="font-sans font-extrabold text-5xl text-gold leading-none my-1">R$ 8,80</p>
-    <p class="text-sm text-white/85">ou <strong class="text-white">R$ 67,00 à vista</strong> com desconto</p>
+        <p class="mt-5 text-sm font-bold tracking-wide">ACESSO VITALÍCIO</p>
+        <p class="text-xs text-white/70">VOCÊ SÓ PAGA UMA ÚNICA VEZ ESSE VALOR!</p>
 
-    <p class="mt-5 text-sm font-bold tracking-wide">ACESSO VITALÍCIO</p>
-    <p class="text-xs text-white/75">VOCÊ SÓ PAGA UMA ÚNICA VEZ ESSE VALOR!</p>
+        <a href="#" class="js-buy btn mt-6 inline-block w-full max-w-[340px] rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-navy font-bold text-base py-4 px-6 shadow-lg">
+          SIM, EU QUERO O DINHEIRO DO CASAL
+        </a>
+        <p class="mt-3 text-xs text-white/65">Acesso imediato após a confirmação do pagamento.</p>
 
-    <a href="#" class="js-buy btn mt-6 inline-block w-full max-w-[300px] rounded-full bg-gradient-to-r from-gold to-gold-dark text-navy font-bold text-base py-4 px-6 shadow-lg">
-      SIM, EU QUERO O DINHEIRO DO CASAL
-    </a>
-    <p class="mt-3 text-xs text-white/70">Condição especial por tempo limitado.</p>
-
-    <div class="mt-7 flex items-center justify-center gap-4 text-[11px] text-white/70">
-      <span>🔒 Compra 100% segura</span>
-      <span>↩ Garantia de 7 dias</span>
+        <div class="mt-6 flex items-center justify-center lg:justify-start gap-5 text-white/70">
+          <span class="flex items-center gap-1.5 text-[11px] font-medium"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><use href="#st-pix"/></svg>Pix</span>
+          <span class="flex items-center gap-1.5 text-[11px] font-medium"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><use href="#st-card"/></svg>Cartão</span>
+          <span class="flex items-center gap-1.5 text-[11px] font-medium"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor"><use href="#st-lock"/></svg>Compra segura</span>
+        </div>
+      </div>
     </div>
   </div>
 </section>
 
-<!-- ============ 10. ESPECIALISTA ============ -->
+<!-- ============ 11. ESPECIALISTA ============ -->
 <section class="w-full bg-navy relative overflow-hidden">
-  <div class="max-w-[480px] mx-auto px-5 pt-10 pb-0 relative z-10">
-    <p class="text-gold font-bold text-xs tracking-wide uppercase">Márcio Morais</p>
-    <h2 class="font-sans font-bold text-xl text-white mt-1 leading-snug">
-      <span class="text-white">MÁRCIO MORAIS</span> é o criador do <span class="text-gold">DINHEIRO DO CASAL</span>
-    </h2>
-    <p class="mt-4 text-sm text-white/85 leading-relaxed">
-      Márcio Morais é especialista em finanças pessoais e empresariais. Casado, ele também já viveu na pele as dificuldades financeiras de um casal, e leva para a vida a dois o mesmo método que usa há anos nos negócios. São 24 anos em gestão estratégica financeira, com foco em método simples, execução rápida e construção de reserva financeira, já aplicado em mais de 150 empresas.
+  <div class="max-w-(--container-content) mx-auto relative z-10 grid lg:grid-cols-2 lg:items-center lg:gap-10">
+    <div class="px-5 lg:pl-10 pt-10 lg:pt-0 pb-0 reveal">
+      <p class="text-gold-light font-bold text-xs tracking-wide uppercase">Márcio Morais</p>
+      <h2 class="font-serif font-semibold text-2xl lg:text-3xl text-white mt-1 leading-snug">
+        <span class="text-white">MÁRCIO MORAIS</span> é o criador do <span class="text-gold-light">DINHEIRO DO CASAL</span>
+      </h2>
+      <p class="mt-4 text-sm lg:text-base text-white/85 leading-relaxed">
+        Márcio Morais é especialista em finanças pessoais e empresariais. Casado, ele também já viveu na pele as dificuldades financeiras de um casal, e leva para a vida a dois o mesmo método que usa há anos nos negócios. São 24 anos em gestão estratégica financeira, com foco em método simples, execução rápida e construção de reserva financeira, já aplicado em mais de 150 empresas.
+      </p>
+      <div class="mt-5 flex flex-wrap gap-2">
+        <span class="inline-flex items-center rounded-full bg-white/10 text-white text-xs font-semibold px-3.5 py-1.5">24 anos em gestão financeira</span>
+        <span class="inline-flex items-center rounded-full bg-white/10 text-white text-xs font-semibold px-3.5 py-1.5">+150 empresas atendidas</span>
+        <span class="inline-flex items-center rounded-full bg-white/10 text-white text-xs font-semibold px-3.5 py-1.5">Método simples e rápido</span>
+      </div>
+    </div>
+    <div class="mt-9 lg:mt-0 w-full flex justify-center lg:justify-end reveal">
+      <img src="/assets/img/marcio-morais.webp" alt="Márcio Morais, especialista em finanças pessoais e empresariais, criador do Dinheiro do Casal" width="640" height="631" loading="lazy" class="w-[78%] lg:w-full max-w-[420px] h-auto object-cover object-top"
+        style="mask-image:linear-gradient(to right, transparent, black 12%, black 88%, transparent); -webkit-mask-image:linear-gradient(to right, transparent, black 12%, black 88%, transparent);">
+    </div>
+  </div>
+</section>
+
+<!-- ============ 12. GARANTIA (novo) ============ -->
+<section class="w-full bg-cream">
+  <div class="max-w-[640px] mx-auto px-5 py-12 lg:py-16 text-center reveal">
+    <svg viewBox="0 0 140 160" class="w-28 h-32 mx-auto mb-5" aria-hidden="true">
+      <defs><linearGradient id="sealGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0D67A"/><stop offset="1" stop-color="#C39A22"/></linearGradient></defs>
+      <path d="M70 4 84 14 101 12 106 29 121 38 116 55 121 72 106 81 101 98 84 96 70 106 56 96 39 98 34 81 19 72 24 55 19 38 34 29 39 12 56 14z" fill="url(#sealGold)" stroke="#0F2A57" stroke-width="1.5"/>
+      <circle cx="70" cy="58" r="34" fill="#0F2A57"/>
+      <path d="M56 58l10 10 20-20" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M52 118 44 156 70 142 96 156 88 118" fill="url(#sealGold)" stroke="#0F2A57" stroke-width="1.5" stroke-linejoin="round"/>
+      <text x="70" y="109" text-anchor="middle" font-size="13" font-weight="800" fill="#0F2A57" font-family="Poppins,sans-serif">7 DIAS</text>
+    </svg>
+    <h2 class="font-serif font-semibold text-xl lg:text-2xl text-navy">Risco zero para você</h2>
+    <p class="mt-3 text-sm lg:text-base text-body max-w-md mx-auto">
+      Se em até 7 dias você sentir que o Dinheiro do Casal não é para vocês, é só pedir o reembolso — sem burocracia, sem perguntas. Devolvemos 100% do valor.
     </p>
   </div>
-  <div class="mt-6 w-full flex justify-end">
-    <img src="/assets/img/marcio-morais.webp" alt="Márcio Morais, especialista em finanças pessoais e empresariais, criador do Dinheiro do Casal" width="640" height="631" loading="lazy" class="w-[78%] max-w-[420px] h-auto object-cover object-top">
+</section>
+
+<!-- ============ 13. BLOCO DE PREÇO (REPETIDO) ============ -->
+<section data-price-block class="w-full bg-gradient-to-br from-navy via-navy2 to-navy text-white relative overflow-hidden">
+  <svg class="pointer-events-none absolute -bottom-16 -left-16 w-96 h-96 text-white/[.04]" viewBox="0 0 200 200" aria-hidden="true"><circle cx="70" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="18"/><circle cx="120" cy="100" r="60" fill="none" stroke="currentColor" stroke-width="18"/></svg>
+  <div class="max-w-(--container-content) mx-auto px-5 lg:px-10 py-12 lg:py-16">
+    <div class="grid lg:grid-cols-2 lg:gap-16 items-center">
+      <div class="reveal order-2 lg:order-1">
+        <img src="/assets/img/mockups/price-collage.webp" alt="Colagem: planilha Dinheiro do Casal aberta em notebook e celular, e os materiais em PDF" width="900" height="620" loading="lazy" class="w-full h-auto max-w-[440px] mx-auto lg:max-w-none">
+      </div>
+      <div class="text-center lg:text-left order-1 lg:order-2 reveal">
+        <p class="text-sm font-semibold tracking-wide text-white/75">APENAS 9x DE</p>
+        <p class="font-serif font-semibold text-6xl lg:text-7xl text-gold-light leading-none my-2">R$ 8,80</p>
+        <p class="text-sm lg:text-base text-white/85">ou <strong class="text-white">R$ 67,00 à vista</strong> com desconto</p>
+        <p class="mt-5 text-sm font-bold tracking-wide">ACESSO VITALÍCIO</p>
+        <p class="text-xs text-white/70">VOCÊ SÓ PAGA UMA ÚNICA VEZ ESSE VALOR!</p>
+        <a href="#" class="js-buy btn mt-6 inline-block w-full max-w-[340px] rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-navy font-bold text-base py-4 px-6 shadow-lg">
+          SIM, EU QUERO O DINHEIRO DO CASAL
+        </a>
+        <p class="mt-3 text-xs text-white/65">Acesso imediato após a confirmação do pagamento.</p>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- ============ 11. BLOCO DE PREÇO (REPETIDO) ============ -->
-<section class="w-full bg-gradient-to-b from-navy to-[#173B73]">
-  <div class="max-w-[480px] mx-auto px-5 py-10 text-center text-white">
-    <svg viewBox="0 0 320 190" class="w-full max-w-[300px] mx-auto mb-6" aria-hidden="true"><use href="#dev-collage"/></svg>
-
-    <svg viewBox="130 60 640 180" role="img" aria-label="Dinheiro do Casal" class="mx-auto h-10 w-auto mb-4">
-      <g transform="translate(0,-300)"><g transform="translate(150,368) scale(1.35)">
-        <defs>
-          <clipPath id="gLogocP2"><circle cx="82" cy="105" r="15"/></clipPath>
-        </defs>
-        <circle cx="52" cy="70" r="44" fill="none" stroke="#5B8AE0" stroke-width="14"/>
-        <circle cx="112" cy="70" r="44" fill="none" stroke="url(#scrGold)" stroke-width="14"/>
-        <g clip-path="url(#gLogocP2)"><circle cx="52" cy="70" r="44" fill="none" stroke="#5B8AE0" stroke-width="14"/></g>
-        <path d="M84 40 A44 44 0 0 1 140 44" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2.5" stroke-linecap="round"/>
-        <g transform="translate(112,22)">
-          <path d="M0 -13 L11 -3 L0 11 L-11 -3 Z" fill="#FFFFFF" stroke="url(#scrGold)" stroke-width="3" stroke-linejoin="round"/>
-          <path d="M-11 -3 H11 M-4 -3 L0 -13 L4 -3 M-4 -3 L0 11 L4 -3" fill="none" stroke="url(#scrGold)" stroke-width="1.4" stroke-linejoin="round"/>
-        </g></g>
-      <text x="400" y="438" font-size="76" fill="#FFFFFF" style="font-family:'Poppins','Montserrat','Helvetica Neue',Arial,sans-serif;font-weight:800;letter-spacing:-1">Dinheiro</text>
-      <text x="400" y="506" font-size="76" fill="#FFFFFF" style="font-family:'Poppins','Montserrat','Helvetica Neue',Arial,sans-serif;font-weight:800;letter-spacing:-1"><tspan font-size="34" dy="-4">do</tspan><tspan dx="10" dy="4">Casal</tspan></text>
-      </g>
-    </svg>
-
-    <p class="text-sm font-semibold tracking-wide text-white/80">APENAS 9x DE</p>
-    <p class="font-sans font-extrabold text-5xl text-gold leading-none my-1">R$ 8,80</p>
-    <p class="text-sm text-white/85">ou <strong class="text-white">R$ 67,00 à vista</strong> com desconto</p>
-
-    <p class="mt-5 text-sm font-bold tracking-wide">ACESSO VITALÍCIO</p>
-    <p class="text-xs text-white/75">VOCÊ SÓ PAGA UMA ÚNICA VEZ ESSE VALOR!</p>
-
-    <a href="#" class="js-buy btn mt-6 inline-block w-full max-w-[300px] rounded-full bg-gradient-to-r from-gold to-gold-dark text-navy font-bold text-base py-4 px-6 shadow-lg">
-      SIM, EU QUERO O DINHEIRO DO CASAL
-    </a>
-    <p class="mt-3 text-xs text-white/70">Condição especial por tempo limitado.</p>
-  </div>
-</section>
-
-<!-- ============ 12. FAQ ============ -->
+<!-- ============ 14. FAQ ============ -->
 <section class="w-full bg-white">
-  <div class="max-w-[480px] mx-auto px-5 py-10">
-    <h2 class="font-sans font-bold text-xl text-center text-navy mb-6">Perguntas Frequentes</h2>
+  <div class="max-w-[640px] mx-auto px-5 py-12 lg:py-16">
+    <h2 class="font-serif font-semibold text-2xl lg:text-3xl text-center text-navy mb-7">Perguntas Frequentes</h2>
 
     <div class="space-y-3">
-      <details class="faq rounded-xl bg-slate px-4 py-1 open:pb-3">
-        <summary class="flex items-center justify-between gap-3 py-3 font-semibold text-sm text-navy">
+      <details class="faq rounded-2xl bg-slate px-5 py-1 open:pb-3">
+        <summary class="flex items-center justify-between gap-3 py-3.5 font-semibold text-sm lg:text-base text-navy">
           O que é o Dinheiro do Casal?
-          <svg class="faq-icon w-5 h-5 shrink-0 text-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          <svg class="faq-icon w-5 h-5 shrink-0 text-blue"><use href="#st-plus"/></svg>
         </summary>
-        <p class="text-sm leading-relaxed pb-1">É uma ferramenta simples, prática e super fácil de usar para o casal organizar as finanças e ter clareza sobre como juntar mais dinheiro todo mês. Além disso, vocês terão uma aula completa sobre mentalidade financeira, para que o casal se alinhe e realize grandes sonhos juntos — e o melhor: sem brigas e discussões.</p>
+        <p class="text-sm lg:text-base leading-relaxed pb-1 text-body">É uma ferramenta simples, prática e super fácil de usar para o casal organizar as finanças e ter clareza sobre como juntar mais dinheiro todo mês. Além disso, vocês terão uma aula completa sobre mentalidade financeira, para que o casal se alinhe e realize grandes sonhos juntos — e o melhor: sem brigas e discussões.</p>
       </details>
 
-      <details class="faq rounded-xl bg-slate px-4 py-1 open:pb-3">
-        <summary class="flex items-center justify-between gap-3 py-3 font-semibold text-sm text-navy">
+      <details class="faq rounded-2xl bg-slate px-5 py-1 open:pb-3">
+        <summary class="flex items-center justify-between gap-3 py-3.5 font-semibold text-sm lg:text-base text-navy">
           Quanto tempo leva para ter resultado?
-          <svg class="faq-icon w-5 h-5 shrink-0 text-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          <svg class="faq-icon w-5 h-5 shrink-0 text-blue"><use href="#st-plus"/></svg>
         </summary>
-        <p class="text-sm leading-relaxed pb-1">Com a planilha em mãos, vocês terão uma visão completa do cenário financeiro do casal em menos de 15 minutos.</p>
+        <p class="text-sm lg:text-base leading-relaxed pb-1 text-body">Com a planilha em mãos, vocês terão uma visão completa do cenário financeiro do casal em menos de 15 minutos.</p>
       </details>
 
-      <details class="faq rounded-xl bg-slate px-4 py-1 open:pb-3">
-        <summary class="flex items-center justify-between gap-3 py-3 font-semibold text-sm text-navy">
+      <details class="faq rounded-2xl bg-slate px-5 py-1 open:pb-3">
+        <summary class="flex items-center justify-between gap-3 py-3.5 font-semibold text-sm lg:text-base text-navy">
           Já tentamos juntar dinheiro antes e não deu certo… por que dessa vez seria diferente?
-          <svg class="faq-icon w-5 h-5 shrink-0 text-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          <svg class="faq-icon w-5 h-5 shrink-0 text-blue"><use href="#st-plus"/></svg>
         </summary>
-        <p class="text-sm leading-relaxed pb-1">Porque de nada adianta ter uma super ferramenta em mãos se o casal não estiver alinhado financeiramente. É por isso que, junto da planilha, vocês recebem uma aula completa de duas horas sobre mentalidade financeira.</p>
+        <p class="text-sm lg:text-base leading-relaxed pb-1 text-body">Porque de nada adianta ter uma super ferramenta em mãos se o casal não estiver alinhado financeiramente. É por isso que, junto da planilha, vocês recebem uma aula completa de duas horas sobre mentalidade financeira.</p>
       </details>
 
-      <details class="faq rounded-xl bg-slate px-4 py-1 open:pb-3">
-        <summary class="flex items-center justify-between gap-3 py-3 font-semibold text-sm text-navy">
+      <details class="faq rounded-2xl bg-slate px-5 py-1 open:pb-3">
+        <summary class="flex items-center justify-between gap-3 py-3.5 font-semibold text-sm lg:text-base text-navy">
           Qual é a forma de pagamento?
-          <svg class="faq-icon w-5 h-5 shrink-0 text-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          <svg class="faq-icon w-5 h-5 shrink-0 text-blue"><use href="#st-plus"/></svg>
         </summary>
-        <p class="text-sm leading-relaxed pb-1">Você pode fazer o pagamento por Pix ou cartão de crédito.</p>
+        <p class="text-sm lg:text-base leading-relaxed pb-1 text-body">Você pode fazer o pagamento por Pix ou cartão de crédito.</p>
       </details>
 
-      <details class="faq rounded-xl bg-slate px-4 py-1 open:pb-3">
-        <summary class="flex items-center justify-between gap-3 py-3 font-semibold text-sm text-navy">
+      <details class="faq rounded-2xl bg-slate px-5 py-1 open:pb-3">
+        <summary class="flex items-center justify-between gap-3 py-3.5 font-semibold text-sm lg:text-base text-navy">
           O pagamento é seguro?
-          <svg class="faq-icon w-5 h-5 shrink-0 text-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          <svg class="faq-icon w-5 h-5 shrink-0 text-blue"><use href="#st-plus"/></svg>
         </summary>
-        <p class="text-sm leading-relaxed pb-1">Sim, o pagamento é 100% seguro, onde utilizamos uma das maiores plataformas de vendas do mundo, a Hotmart.</p>
+        <p class="text-sm lg:text-base leading-relaxed pb-1 text-body">Sim, o pagamento é 100% seguro, onde utilizamos uma das maiores plataformas de vendas do mundo, a Hotmart.</p>
       </details>
 
-      <details class="faq rounded-xl bg-slate px-4 py-1 open:pb-3">
-        <summary class="flex items-center justify-between gap-3 py-3 font-semibold text-sm text-navy">
+      <details class="faq rounded-2xl bg-slate px-5 py-1 open:pb-3">
+        <summary class="flex items-center justify-between gap-3 py-3.5 font-semibold text-sm lg:text-base text-navy">
           Como recebo a Planilha?
-          <svg class="faq-icon w-5 h-5 shrink-0 text-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          <svg class="faq-icon w-5 h-5 shrink-0 text-blue"><use href="#st-plus"/></svg>
         </summary>
-        <p class="text-sm leading-relaxed pb-1">Assim que o seu pagamento for concluído, enviaremos os dados de login no email que você cadastrou. Uma vez com os dados de login em mãos, o acesso completo à Planilha e à todas as aulas será imediato.</p>
+        <p class="text-sm lg:text-base leading-relaxed pb-1 text-body">Assim que o seu pagamento for concluído, enviaremos os dados de login no email que você cadastrou. Uma vez com os dados de login em mãos, o acesso completo à Planilha e à todas as aulas será imediato.</p>
       </details>
 
-      <details class="faq rounded-xl bg-slate px-4 py-1 open:pb-3">
-        <summary class="flex items-center justify-between gap-3 py-3 font-semibold text-sm text-navy">
+      <details class="faq rounded-2xl bg-slate px-5 py-1 open:pb-3">
+        <summary class="flex items-center justify-between gap-3 py-3.5 font-semibold text-sm lg:text-base text-navy">
           E se eu não gostar?
-          <svg class="faq-icon w-5 h-5 shrink-0 text-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          <svg class="faq-icon w-5 h-5 shrink-0 text-blue"><use href="#st-plus"/></svg>
         </summary>
-        <p class="text-sm leading-relaxed pb-1">Caso você não goste, devolvemos o seu investimento sem burocracia — dentro do prazo de 7 dias após a compra.</p>
+        <p class="text-sm lg:text-base leading-relaxed pb-1 text-body">Caso você não goste, devolvemos o seu investimento sem burocracia — dentro do prazo de 7 dias após a compra.</p>
       </details>
     </div>
   </div>
@@ -554,9 +635,9 @@
 
 </main>
 
-<!-- ============ 13. RODAPÉ ============ -->
+<!-- ============ 15. RODAPÉ ============ -->
 <footer class="w-full bg-navy text-white/70">
-  <div class="max-w-[480px] mx-auto px-5 py-7 text-center text-xs leading-relaxed">
+  <div class="max-w-(--container-content) mx-auto px-5 lg:px-10 py-8 text-center text-xs leading-relaxed">
     <p>
       <a href="/termos.html" class="underline hover:text-white">TERMOS DE USO E POLÍTICA DE PRIVACIDADE</a> <!-- TODO-PENDENTE: revisar com jurídico antes de publicar em caráter definitivo -->
       &nbsp;|&nbsp;
@@ -566,6 +647,17 @@
     <p class="mt-2 text-white/50">Conteúdo educacional. Os resultados dependem da aplicação do método por cada casal.</p>
   </div>
 </footer>
+
+<!-- ============ BARRA FIXA DE COMPRA (mobile) ============ -->
+<div id="sticky-bar" class="lg:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-navy/10 shadow-[0_-6px_20px_rgba(15,42,87,.12)] px-4 py-3 flex items-center justify-between gap-3">
+  <div class="leading-tight">
+    <p class="text-[10px] font-semibold text-strike uppercase">9x de</p>
+    <p class="text-lg font-extrabold text-navy -mt-0.5">R$ 8,80</p>
+  </div>
+  <a href="#" class="js-buy btn shrink-0 rounded-full bg-gradient-to-r from-gold-light via-gold to-gold-dark text-navy font-bold text-xs py-3 px-5 shadow-md">
+    Quero o Dinheiro do Casal
+  </a>
+</div>
 
 <script>
 (function(){
@@ -599,8 +691,93 @@
   // ---- Ano do copyright ----
   var y = document.getElementById("ano-copyright");
   if (y) y.textContent = new Date().getFullYear();
+
+  // ---- Revelação suave ao rolar ----
+  // Progressive enhancement: só ativa a animação (classe .js-anim) quando o
+  // navegador suporta IntersectionObserver e o usuário não pediu menos
+  // movimento. Um temporizador de segurança garante que, mesmo se algo
+  // impedir o observer de disparar, o conteúdo nunca fique escondido.
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if ("IntersectionObserver" in window && !reduceMotion) {
+    document.documentElement.classList.add("js-anim");
+    var revealItems = document.querySelectorAll(".reveal");
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in");
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+    revealItems.forEach(function(el){ io.observe(el); });
+
+    // rede de segurança: garante visibilidade mesmo se o observer falhar
+    setTimeout(function(){
+      document.querySelectorAll(".reveal:not(.in)").forEach(function(el){ el.classList.add("in"); });
+    }, 1500);
+  }
+
+  // ---- Barra fixa de compra (mobile): aparece depois do hero, some nos blocos de preço ----
+  // Checagem direta da posição no scroll (com throttle por requestAnimationFrame),
+  // em vez de IntersectionObserver: assim funciona também em saltos instantâneos
+  // de scroll (tecla Fim, "voltar" do navegador, scroll rápido), que podem pular
+  // o cruzamento de threshold que o IntersectionObserver precisa para disparar.
+  var stickyBar = document.getElementById("sticky-bar");
+  var heroEnd = document.getElementById("hero-end");
+  var priceBlocks = document.querySelectorAll("[data-price-block]");
+  if (stickyBar && heroEnd) {
+    var ticking = false;
+    function checkStickyBar(){
+      var pastHero = heroEnd.getBoundingClientRect().top < 0;
+      var inPriceBlock = false;
+      priceBlocks.forEach(function(el){
+        var r = el.getBoundingClientRect();
+        if (r.top < window.innerHeight && r.bottom > 0) inPriceBlock = true;
+      });
+      if (pastHero && !inPriceBlock) stickyBar.classList.add("show");
+      else stickyBar.classList.remove("show");
+      ticking = false;
+    }
+    window.addEventListener("scroll", function(){
+      if (!ticking) { requestAnimationFrame(checkStickyBar); ticking = true; }
+    }, { passive: true });
+    window.addEventListener("resize", function(){
+      if (!ticking) { requestAnimationFrame(checkStickyBar); ticking = true; }
+    });
+    // estado inicial: adiado para requestAnimationFrame para não forçar um
+    // layout síncrono no meio do parsing do script (evita "forced reflow").
+    requestAnimationFrame(checkStickyBar);
+  }
+
+  // ---- Pixel Meta: carregado só depois do "load", e ainda assim só quando o
+  // navegador estiver ocioso — o evento "load" só dispara depois que a própria
+  // imagem do hero termina de baixar, então iniciar o pixel exatamente nesse
+  // instante concorre com a pintura do LCP. requestIdleCallback empurra a
+  // execução pesada do fbevents.js para depois que a página já pintou. ----
+  window.addEventListener("load", function(){
+    function initPixel(){
+      var META_PIXEL_ID = "642109472173213"; // Pixel Meta — campanha "Destravando o Lucro" (reaproveitado, conforme briefing)
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window,document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', META_PIXEL_ID);
+      fbq('track', 'PageView');
+      // Purchase NÃO é disparado aqui: a Hotmart já dispara esse evento no checkout/obrigado.
+    }
+    if ("requestIdleCallback" in window) {
+      requestIdleCallback(initPixel, { timeout: 2000 });
+    } else {
+      setTimeout(initPixel, 200);
+    }
+  });
 })();
 </script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=642109472173213&ev=PageView&noscript=1"/></noscript>
 
 </body>
 </html>
