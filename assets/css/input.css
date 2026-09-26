@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Poppins', system-ui, sans-serif;
+
+  --color-navy: #0F2A57;
+  --color-blue: #1E4FA3;
+  --color-gold: #D4AF37;
+  --color-gold-dark: #C39A22;
+  --color-cream: #FFF8F0;
+  --color-slate: #F4F7FB;
+  --color-body: #4B5A73;
+  --color-coral: #E8837A;
+  --color-wine: #A83A56;
+  --color-green: #14794F;
+  --color-strike: #5E697C;
+
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.75rem;
+}

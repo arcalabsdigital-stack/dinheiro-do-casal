@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="-6 4 172 172">
+  <defs>
+    <linearGradient id="gLogo" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0D67A"/><stop offset="1" stop-color="#C39A22"/></linearGradient>
+    <clipPath id="gLogoc"><circle cx="82" cy="105" r="15"/></clipPath>
+  </defs>
+  <rect x="-6" y="4" width="172" height="172" rx="34" fill="#FFF8F0"/>
+  <circle cx="52" cy="70" r="44" fill="none" stroke="#1E4FA3" stroke-width="14"/>
+  <circle cx="112" cy="70" r="44" fill="none" stroke="url(#gLogo)" stroke-width="14"/>
+  <g clip-path="url(#gLogoc)"><circle cx="52" cy="70" r="44" fill="none" stroke="#1E4FA3" stroke-width="14"/></g>
+  <path d="M84 40 A44 44 0 0 1 140 44" fill="none" stroke="#FFFFFF" stroke-opacity=".45" stroke-width="2.5" stroke-linecap="round"/>
+  <g transform="translate(112,22)">
+    <path d="M0 -13 L11 -3 L0 11 L-11 -3 Z" fill="#FFFFFF" stroke="url(#gLogo)" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M-11 -3 H11 M-4 -3 L0 -13 L4 -3 M-4 -3 L0 11 L4 -3" fill="none" stroke="url(#gLogo)" stroke-width="1.4" stroke-linejoin="round"/>
+  </g>
+</svg>
