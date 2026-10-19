@@ -20,20 +20,28 @@
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/favicon-32.png">
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<!-- Fontes carregadas sem bloquear a renderização (preload + swap para "stylesheet") -->
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&display=swap"></noscript>
+<!-- Fonte do H1 (Fraunces) pré-carregada; as demais fontes são hospedadas em /assets/fonts (ver @font-face no <style>) -->
+<link rel="preload" as="font" type="font/woff2" href="/assets/fonts/fraunces-600.woff2" crossorigin>
 
-<!-- Imagem do hero (LCP) pré-carregada — versão mobile, a que carrega por padrão -->
-<link rel="preload" as="image" href="/assets/img/hero-casal-mobile-480.webp" imagesrcset="/assets/img/hero-casal-mobile-480.webp 480w, /assets/img/hero-casal-mobile-800.webp 800w" imagesizes="(min-width: 1024px) 0px, 90vw">
+<!-- Imagem do hero (LCP) pré-carregada só no mobile (no desktop o <picture> usa outra imagem); srcset/sizes idênticos aos do <img> -->
+<link rel="preload" as="image" media="(max-width:1023px)" href="/assets/img/hero-casal-mobile-800.webp" imagesrcset="/assets/img/hero-casal-mobile-480.webp 480w, /assets/img/hero-casal-mobile-560.webp 560w, /assets/img/hero-casal-mobile-800.webp 800w, /assets/img/hero-casal-mobile-1000.webp 1000w" imagesizes="(min-width:1024px) 46vw, 280px" fetchpriority="high">
 
 <!-- Tailwind compilado para produção (não usamos o CDN: ele compila no navegador e prejudica a performance) -->
 <link rel="stylesheet" href="/assets/css/styles.css">
 
 <style>
+  /* ---- Fontes hospedadas localmente (subset latin, woff2) ---- */
+  @font-face{ font-family:'Poppins'; font-style:normal; font-weight:400; font-display:swap; src:url('/assets/fonts/poppins-400.woff2') format('woff2'); }
+  @font-face{ font-family:'Poppins'; font-style:normal; font-weight:500; font-display:swap; src:url('/assets/fonts/poppins-500.woff2') format('woff2'); }
+  @font-face{ font-family:'Poppins'; font-style:normal; font-weight:600; font-display:swap; src:url('/assets/fonts/poppins-600.woff2') format('woff2'); }
+  @font-face{ font-family:'Poppins'; font-style:normal; font-weight:700; font-display:swap; src:url('/assets/fonts/poppins-700.woff2') format('woff2'); }
+  @font-face{ font-family:'Poppins'; font-style:normal; font-weight:800; font-display:swap; src:url('/assets/fonts/poppins-800.woff2') format('woff2'); }
+  @font-face{ font-family:'Fraunces'; font-style:normal; font-weight:600; font-display:swap; src:url('/assets/fonts/fraunces-600.woff2') format('woff2'); }
+  /* Fontes reserva com métricas ajustadas à Fraunces 600 (evita re-quebra do H1 na troca de fonte): Georgia (Windows/Mac/iOS), Times/Liberation (Linux), Noto Serif (Android) */
+  @font-face{ font-family:'Fraunces Fallback'; font-style:normal; font-weight:600; src:local('Georgia Bold'), local('Georgia-Bold'); size-adjust:91.7%; ascent-override:106.65%; descent-override:27.81%; line-gap-override:0%; }
+  @font-face{ font-family:'Fraunces Fallback Times'; font-style:normal; font-weight:600; src:local('Times New Roman Bold'), local('TimesNewRomanPS-BoldMT'), local('Liberation Serif Bold'), local('LiberationSerif-Bold'); size-adjust:111.3%; ascent-override:87.87%; descent-override:22.91%; line-gap-override:0%; }
+  @font-face{ font-family:'Fraunces Fallback Noto'; font-style:normal; font-weight:600; src:local('Noto Serif Bold'), local('NotoSerif-Bold'); size-adjust:94.5%; ascent-override:113.12%; descent-override:31.01%; line-gap-override:0%; }
+
   :root{ color-scheme: light; }
   html{ scroll-behavior:smooth; }
   body{ background:#FFFFFF; -webkit-font-smoothing:antialiased; }
@@ -175,7 +183,7 @@
       <div class="relative mt-6 lg:mt-0 mx-auto max-w-[280px] lg:max-w-none">
         <picture>
           <source media="(min-width:1024px)" srcset="/assets/img/hero-casal-desktop-800.webp 800w, /assets/img/hero-casal-desktop-1200.webp 1200w, /assets/img/hero-casal-desktop-1600.webp 1600w" sizes="(min-width:1280px) 560px, 46vw">
-          <img src="/assets/img/hero-casal-mobile-800.webp" srcset="/assets/img/hero-casal-mobile-480.webp 480w, /assets/img/hero-casal-mobile-800.webp 800w, /assets/img/hero-casal-mobile-1000.webp 1000w" sizes="(min-width:1024px) 46vw, 90vw" alt="Casal sorrindo, olhando juntos para o notebook, organizando as finanças em casa" width="1000" height="1143" class="rounded-[2rem] w-full h-auto shadow-xl shadow-navy/15 aspect-[1000/1143] lg:aspect-[1200/873] object-cover" fetchpriority="high">
+          <img src="/assets/img/hero-casal-mobile-800.webp" srcset="/assets/img/hero-casal-mobile-480.webp 480w, /assets/img/hero-casal-mobile-560.webp 560w, /assets/img/hero-casal-mobile-800.webp 800w, /assets/img/hero-casal-mobile-1000.webp 1000w" sizes="(min-width:1024px) 46vw, 280px" alt="Casal sorrindo, olhando juntos para o notebook, organizando as finanças em casa" width="1000" height="1143" class="rounded-[2rem] w-full h-auto shadow-xl shadow-navy/15 aspect-[1000/1143] lg:aspect-[1200/873] object-cover" fetchpriority="high">
         </picture>
 
         <span class="float-badge d1 absolute -left-4 top-8 w-11 h-11 lg:w-12 lg:h-12 drop-shadow-md"><svg class="w-full h-full" viewBox="0 0 24 24"><use href="#ic-dollar"/></svg></span>
@@ -283,7 +291,7 @@
         </ul>
       </div>
       <div class="order-1 lg:order-2 reveal">
-        <img src="/assets/img/mockups/veja-por-dentro.webp" alt="Prévia da planilha Dinheiro do Casal aberta em notebook e celular, mostrando o Painel do Mês" width="1100" height="720" loading="lazy" class="w-full h-auto">
+        <img src="/assets/img/mockups/veja-por-dentro.webp" srcset="/assets/img/mockups/veja-por-dentro-700.webp 700w, /assets/img/mockups/veja-por-dentro.webp 1100w, /assets/img/mockups/veja-por-dentro-1300.webp 1300w" sizes="(min-width:1024px) 492px, calc(100vw - 40px)" alt="Prévia da planilha Dinheiro do Casal aberta em notebook e celular, mostrando o Painel do Mês" width="1100" height="720" loading="lazy" class="w-full h-auto">
         <p class="mt-2 text-center text-[11px] text-strike">Imagem ilustrativa, com dados de exemplo.</p>
       </div>
     </div>

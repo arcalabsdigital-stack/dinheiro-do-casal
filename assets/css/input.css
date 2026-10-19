@@ -2,7 +2,7 @@
 
 @theme {
   --font-sans: 'Poppins', system-ui, sans-serif;
-  --font-serif: 'Fraunces', 'DM Serif Display', Georgia, serif;
+  --font-serif: 'Fraunces', 'Fraunces Fallback', 'Fraunces Fallback Times', 'Fraunces Fallback Noto', 'DM Serif Display', Georgia, serif;
 
   --color-navy: #0F2A57;
   --color-navy2: #173B73;
